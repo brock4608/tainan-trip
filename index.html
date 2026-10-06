@@ -319,6 +319,168 @@
       .region { font-size: 11px; }
       .poll-grid { grid-template-columns: 1fr; }
     }
+  
+    /* ===== Premium visual layer ===== */
+    body {
+      background:
+        radial-gradient(circle at 50% -8%, rgba(244, 201, 91, .20), transparent 34%),
+        radial-gradient(circle at 0% 48%, rgba(168, 59, 50, .045), transparent 28%),
+        linear-gradient(180deg, #fffdf8 0%, #f4ecdf 48%, #fbf7ef 100%);
+    }
+    .wrap { width: min(960px, calc(100% - 28px)); }
+    .cover-image {
+      border-radius: 0 0 34px 34px;
+      box-shadow: 0 24px 60px rgba(72, 43, 23, .16);
+      filter: saturate(.94) contrast(1.02);
+    }
+    header {
+      margin-top: 0;
+      padding: 78px 22px 46px;
+      border-radius: 0 0 42px 42px;
+      background:
+        radial-gradient(circle at 50% 25%, rgba(255,255,255,.99) 0 9%, rgba(255,244,198,.82) 22%, rgba(246,204,92,.22) 44%, transparent 70%);
+    }
+    header::before {
+      width: 760px; height: 760px; top: -250px;
+      opacity: .72;
+      animation: rays 18s linear infinite;
+    }
+    header::after { top: 25px; font-size: 34px; color: rgba(169,123,45,.38); }
+    .blessing { letter-spacing: .30em; text-shadow: 0 1px 0 #fff; }
+    .eyebrow {
+      border-color: rgba(169,59,50,.20);
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 8px 24px rgba(90,54,30,.06);
+      backdrop-filter: blur(8px);
+    }
+    h1 {
+      font-family: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-shadow: 0 2px 0 rgba(255,255,255,.8), 0 12px 30px rgba(127,41,37,.10);
+    }
+    .subtitle { font-size: 17px; }
+    .notice {
+      border: 1px solid rgba(234,220,201,.85);
+      background: rgba(255,255,255,.76);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 14px 38px rgba(83,52,30,.08);
+    }
+    .day { margin: 42px 0 48px; }
+    .day-title { margin-bottom: 18px; }
+    .day-no {
+      width: 54px; height: 54px; flex-basis: 54px;
+      border-radius: 17px;
+      background: linear-gradient(145deg, #b4493e, #7f2925);
+      box-shadow: 0 10px 24px rgba(127,41,37,.20);
+    }
+    .day-title h2 {
+      font-family: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif;
+      font-weight: 900;
+      letter-spacing: .04em;
+    }
+    .stops { gap: 16px; }
+    .stop {
+      overflow: hidden;
+      padding: 20px;
+      border: 1px solid rgba(234,220,201,.92);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,250,241,.88));
+      box-shadow: 0 12px 30px rgba(83,52,30,.075);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .stop::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, #d3aa55, #a83b32);
+      opacity: .65;
+    }
+    .stop:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(83,52,30,.11);
+      border-color: rgba(201,151,62,.45);
+    }
+    .time { letter-spacing: .06em; }
+    .region {
+      border: 1px solid rgba(93,117,97,.12);
+      background: rgba(238,244,237,.82);
+    }
+    .stop h3 {
+      font-family: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif;
+      font-weight: 900;
+      letter-spacing: .025em;
+    }
+    .vote { border-top-color: rgba(234,220,201,.8); }
+    .vote input { accent-color: #a83b32; }
+    .poll {
+      position: relative;
+      overflow: hidden;
+      margin: 52px 0 52px;
+      padding: 30px 22px;
+      border: 1px solid rgba(246,224,171,.22);
+      border-radius: 30px;
+      background:
+        radial-gradient(circle at 85% 0%, rgba(255,219,119,.18), transparent 32%),
+        radial-gradient(circle at 10% 100%, rgba(255,255,255,.08), transparent 30%),
+        linear-gradient(145deg, #8e302b, #641f1d);
+      box-shadow: 0 24px 55px rgba(91,31,28,.22);
+    }
+    .poll::before {
+      content: "☸";
+      position: absolute;
+      right: 20px; top: -18px;
+      color: rgba(255,220,130,.12);
+      font-size: 150px;
+      line-height: 1;
+      transform: rotate(10deg);
+      pointer-events: none;
+    }
+    .poll h2 {
+      position: relative;
+      z-index: 1;
+      font-family: "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif;
+      font-size: 28px;
+      letter-spacing: .05em;
+    }
+    .poll p, .poll label { position: relative; z-index: 1; }
+    .poll-grid { position: relative; z-index: 1; gap: 12px; }
+    .poll-option label {
+      padding: 16px 8px;
+      border-color: rgba(255,255,255,.20);
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(6px);
+      transition: .2s ease;
+    }
+    .poll-option label:hover { background: rgba(255,255,255,.13); }
+    .poll-option input:checked + label {
+      box-shadow: 0 8px 22px rgba(255,230,170,.16);
+      transform: translateY(-1px);
+    }
+    .submit {
+      position: relative;
+      z-index: 1;
+      letter-spacing: .05em;
+      background: linear-gradient(135deg, #e2bc68, #c9973e);
+      box-shadow: 0 12px 26px rgba(43,19,16,.18);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .submit:hover { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(43,19,16,.24); }
+    #vote-counts { position: relative; z-index: 1; }
+    footer {
+      padding-bottom: 44px;
+      letter-spacing: .04em;
+    }
+    @keyframes rays {
+      from { transform: translateX(-50%) rotate(0deg); }
+      to { transform: translateX(-50%) rotate(360deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      header::before { animation: none; }
+      .stop, .submit { transition: none; }
+    }
+
   </style>
 </head>
 <body>
