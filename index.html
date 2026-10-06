@@ -260,7 +260,7 @@
     <section class="day" aria-labelledby="dinner-vote-title">
       <h2 class="day-title" id="dinner-vote-title"><span>VOTE</span>晚餐投票</h2>
       <div class="stop" id="dinner-vote">
-        <p style="margin:0 0 12px;">先填暱稱，再選一個晚餐選項。投票送出後不能修改或刪除。</p>
+        <p id="vote-status" style="margin:0 0 12px;">投票開放中。先填暱稱，再選一個晚餐選項；投票送出後不能修改或刪除。</p>
         <form id="dinner-vote-form">
           <label for="nickname" style="display:block;margin-bottom:6px;font-weight:700;">暱稱</label>
           <input id="nickname" name="nickname" type="text" maxlength="50" required autocomplete="nickname" placeholder="請輸入暱稱" style="width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--text);margin-bottom:14px;">
@@ -271,6 +271,10 @@
         <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
           <div style="font-weight:700;margin-bottom:7px;">目前票數</div>
           <div id="vote-results" style="display:grid;gap:6px;"></div>
+        </div>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
+          <button id="close-poll-button" type="button" style="width:100%;padding:11px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);font:inherit;font-weight:700;cursor:pointer;">主揪操作：結束投票</button>
+          <p style="margin:8px 0 0;font-size:14px;color:var(--muted);">只有知道主揪密語的人可以結束投票。</p>
         </div>
       </div>
     </section>
@@ -292,6 +296,8 @@
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_eN5Z1YuNUwEFnbUIo1LREw_Ter0Fb2g";
     const DINNER_OPTIONS = ["台菜", "火鍋", "燒肉", "台南小吃"];
     const tableUrl = `${SUPABASE_URL}/rest/v1/dinner_votes`;
+    const statusUrl = `${SUPABASE_URL}/rest/v1/poll_status?id=eq.1&select=is_closed`;
+    const closePollUrl = `${SUPABASE_URL}/functions/v1/close-poll`;
     const headers = {
       apikey: SUPABASE_PUBLISHABLE_KEY,
       Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
@@ -303,6 +309,8 @@
     const optionsEl = document.getElementById("dinner-options");
     const resultsEl = document.getElementById("vote-results");
     const messageEl = document.getElementById("vote-message");
+    const statusEl = document.getElementById("vote-status");
+    const closePollButton = document.getElementById("close-poll-button");
 
     DINNER_OPTIONS.forEach((option, index) => {
       const label = document.createElement("label");
@@ -310,6 +318,30 @@
       label.innerHTML = `<input type="radio" name="option" value="${option}" ${index === 0 ? "required" : ""} style="width:18px;height:18px;"> <span>${option}</span>`;
       optionsEl.appendChild(label);
     });
+
+    async function loadPollStatus() {
+      try {
+        const response = await fetch(statusUrl, { headers });
+        if (!response.ok) throw new Error(`狀態讀取失敗（${response.status}）`);
+        const rows = await response.json();
+        const isClosed = rows[0]?.is_closed === true;
+        form.querySelectorAll("input, button[type=submit]").forEach(el => { el.disabled = isClosed; });
+        statusEl.textContent = isClosed
+          ? "投票已結束，現在只顯示最終票數。"
+          : "投票開放中。先填暱稱，再選一個晚餐選項；投票送出後不能修改或刪除。";
+        closePollButton.disabled = isClosed;
+        closePollButton.textContent = isClosed ? "投票已結束" : "主揪操作：結束投票";
+        if (isClosed) {
+          closePollButton.style.opacity = "0.6";
+          closePollButton.style.cursor = "default";
+        }
+        return isClosed;
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = "目前無法確認投票狀態，請稍後重新整理。";
+        return false;
+      }
+    }
 
     async function loadVoteResults() {
       try {
@@ -329,6 +361,8 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      const isClosed = await loadPollStatus();
+      if (isClosed) return;
       const nickname = nicknameInput.value.trim();
       const option = new FormData(form).get("option");
       if (!nickname || !option) return;
@@ -352,6 +386,42 @@
       }
     });
 
+    closePollButton.addEventListener("click", async () => {
+      if (closePollButton.disabled) return;
+      const password = window.prompt("請輸入主揪密語：");
+      if (password === null) return;
+      if (!password.trim()) {
+        messageEl.textContent = "未輸入密語，投票仍開放。";
+        return;
+      }
+
+      closePollButton.disabled = true;
+      messageEl.textContent = "正在確認主揪密語……";
+      try {
+        const response = await fetch(closePollUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+          },
+          body: JSON.stringify({ password })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || `結束投票失敗（${response.status}）`);
+        }
+        messageEl.textContent = "投票已結束。";
+        await loadPollStatus();
+        await loadVoteResults();
+      } catch (error) {
+        messageEl.textContent = "密語錯誤或結束投票失敗，投票仍開放。";
+        console.error(error);
+        closePollButton.disabled = false;
+      }
+    });
+
+    await loadPollStatus();
     loadVoteResults();
   </script>
 </body>
