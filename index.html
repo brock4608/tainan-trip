@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台南兩天一夜</title>
+  <style>
+    :root {
+      --bg: #f8efe4;
+      --card: #fffaf2;
+      --text: #49362d;
+      --muted: #78675d;
+      --accent: #b86b4c;
+      --accent-soft: #efd1bf;
+      --line: #ead8c9;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #fff9f1 0, var(--bg) 42%, #f4e7d9 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: 21px;
+      line-height: 1.8;
+    }
+
+    .page {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding: 28px 18px 44px;
+    }
+
+    header {
+      margin-bottom: 12px;
+      padding: 30px 18px 28px;
+      text-align: center;
+      background: rgba(255, 250, 242, .82);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow: 0 8px 24px rgba(110, 76, 55, .08);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 9vw, 46px);
+      line-height: 1.2;
+      letter-spacing: .04em;
+      color: #8f513d;
+    }
+
+    .intro {
+      margin: 14px auto 0;
+      max-width: 34em;
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    .day { margin-top: 24px; }
+
+    .day-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 12px;
+      font-size: 27px;
+      line-height: 1.35;
+    }
+
+    .day-title span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 54px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .stops { display: grid; gap: 12px; }
+
+    .stop {
+      padding: 19px 18px 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(60, 45, 35, .04);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 12px;
+      margin-bottom: 5px;
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .time::before { content: "時間  "; }
+    .place::before { content: "地點  "; }
+
+    .stop h3 {
+      margin: 0 0 5px;
+      font-size: 25px;
+      line-height: 1.5;
+    }
+
+    .stop p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    .note {
+      margin-top: 22px;
+      padding: 13px 15px;
+      border-left: 4px solid var(--accent-soft);
+      background: rgba(255, 253, 249, .7);
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 420px) {
+      body { font-size: 20px; }
+      .page { padding: 22px 14px 36px; }
+      header { padding-top: 14px; }
+      .day-title { font-size: 27px; }
+      .stop { padding: 15px; }
+      .stop h3 { font-size: 24px; }
+      .stop p { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="eyebrow">給我們最可愛的長輩們 ♡</p>
+      <h1>都這把年紀了還不走</h1>
+      <p class="intro">台南兩天一夜小旅行｜慢慢走、慢慢吃，大家開心最重要</p>
+    </header>
+
+    <section class="day" aria-labelledby="day1-title">
+      <h2 class="day-title" id="day1-title"><span>DAY 1</span>第一天</h2>
+      <div class="stops">
+        <article class="stop">
+          <div class="meta">
+            <span class="time">09:30</span>
+            <span class="place">台南車站</span>
+          </div>
+          <h3>抵達台南・租車／集合</h3>
+          <p>先整理行李、取車，準備開始悠閒的台南小旅行。</p>
+        </article>
+
+        <article class="stop">
+          <div class="meta">
+            <span class="time">11:00</span>
+            <span class="place">示意店家：老台南早餐店</span>
+          </div>
+          <h3>早午餐</h3>
+          <p>先吃一頓在地風味，補充體力再開始逛街散步。</p>
+        </article>
+
+        <article class="stop">
+          <div class="meta">
+            <span class="time">14:00</span>
+            <span class="place">安平老街</span>
+          </div>
+          <h3>安平散步</h3>
+          <p>逛老街、吃小吃，沿著老街區慢慢感受台南的歷史氣氛。</p>
+        </article>
+
+        <article class="stop">
+          <div class="meta">
+            <span class="time">18:30</span>
+            <span class="place">示意店家：台南小館</span>
+          </div>
+          <h3>晚餐</h3>
+          <p>安排一間適合大家一起吃飯的台南餐廳，晚餐後自由散步。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="day" aria-labelledby="day2-title">
+      <h2 class="day-title" id="day2-title"><span>DAY 2</span>第二天</h2>
+      <div class="stops">
+        <article class="stop">
+          <div class="meta">
+            <span class="time">09:00</span>
+            <span class="place">示意店家：巷弄咖啡店</span>
+          </div>
+          <h3>早餐／咖啡</h3>
+          <p>用一杯咖啡和簡單早餐開啟第二天，不趕行程、慢慢享受。</p>
+        </article>
+
+        <article class="stop">
+          <div class="meta">
+            <span class="time">11:00</span>
+            <span class="place">孔廟文化園區</span>
+          </div>
+          <h3>古蹟散步</h3>
+          <p>走訪孔廟周邊街區，順路看看老建築與特色小店。</p>
+        </article>
+
+        <article class="stop">
+          <div class="meta">
+            <span class="time">13:00</span>
+            <span class="place">示意店家：台南人氣小吃</span>
+          </div>
+          <h3>午餐</h3>
+          <p>安排經典台南小吃，吃飽後留一點時間自由活動。</p>
+        </article>
+
+        <article class="stop">
+          <div class="meta">
+            <span class="time">15:30</span>
+            <span class="place">神農街／海安路</span>
+          </div>
+          <h3>最後散步・返程</h3>
+          <p>逛逛特色街區、買伴手禮，之後整理行李準備回程。</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="note">※ 本頁目前使用示意店名與時間，之後可直接在這個檔案內替換成正式行程。</div>
+
+    <section class="day" aria-labelledby="reminder-title">
+      <h2 class="day-title" id="reminder-title"><span>NOTE</span>行前提醒</h2>
+      <div class="note" style="margin-top: 0;">
+        <div>天氣：示意｜出發前確認台南天氣，依預報準備雨具與衣物。</div>
+        <div>要帶的東西：示意｜手機、充電器、雨具、防曬用品與個人用品。</div>
+        <div>集合時間：示意｜第一天 09:30，請提前 10 分鐘抵達。</div>
+      </div>
+    </section>
+
+    <footer>台南兩天一夜 · 行程草稿</footer>
+  </main>
+</body>
+</html>
