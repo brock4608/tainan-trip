@@ -577,6 +577,7 @@
 
     <section class="poll" aria-label="北中南投票">
       <h2>🙏 最重要的一票</h2>
+      <div id="poll-status" style="position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;margin:0 0 10px;padding:5px 10px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.07);font-size:12px;font-weight:800;">讀取投票狀態…</div>
       <p>如果只能選一區，你最想去哪裡祈福？</p>
       <label for="nickname" style="display:block; margin-bottom:8px; font-size:14px; font-weight:800; color:#f6e7db;">暱稱</label>
       <input id="nickname" type="text" maxlength="50" autocomplete="nickname" placeholder="請輸入暱稱" style="width:100%; padding:13px 14px; border:0; border-radius:12px; background:#fff6e8; color:var(--ink); font:inherit; font-size:15px; outline:none;">
@@ -585,8 +586,15 @@
         <div class="poll-option"><input type="radio" name="region" id="central" value="中部"><label for="central">中部</label></div>
         <div class="poll-option"><input type="radio" name="region" id="south" value="南部"><label for="south">南部</label></div>
       </div>
-      <button class="submit" type="button" onclick="vote()">送出我的神聖一票</button>
+      <button id="vote-submit" class="submit" type="button" onclick="vote()">送出我的神聖一票</button>
       <div id="result" aria-live="polite"></div>
+      <div style="position:relative;z-index:1;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);">
+        <div style="font-size:13px;font-weight:800;color:#f6e7db;margin-bottom:8px;">主揪控制</div>
+        <div style="display:flex;gap:8px;">
+          <input id="organizer-secret" type="password" maxlength="100" autocomplete="off" placeholder="輸入主揪密語" style="min-width:0;flex:1;padding:12px 13px;border:0;border-radius:12px;background:#fff6e8;color:var(--ink);font:inherit;outline:none;">
+          <button type="button" onclick="closePoll()" style="padding:12px 14px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:800;cursor:pointer;">結束投票</button>
+        </div>
+      </div>
       <div id="vote-counts" aria-live="polite" style="margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.18); font-size:14px;"></div>
     </section>
 
@@ -607,11 +615,33 @@
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_5WrZruS6FvGtGmyqR1w_ag_Hw2qhAZR";
     const BUDGET_VOTE_OPTIONS = ["北部", "中部", "南部"];
     const BUDGET_VOTES_URL = `${SUPABASE_URL}/rest/v1/budget_votes`;
+    const POLL_STATUS_URL = `${SUPABASE_URL}/rest/v1/poll_status`;
+    const CLOSE_POLL_URL = `${SUPABASE_URL}/functions/v1/close-poll`;
+    let pollClosed = false;
     const SUPABASE_HEADERS = {
       apikey: SUPABASE_PUBLISHABLE_KEY,
       Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
       "Content-Type": "application/json"
     };
+
+    async function loadPollStatus() {
+      const statusEl = document.getElementById('poll-status');
+      const submitEl = document.getElementById('vote-submit');
+      try {
+        const response = await fetch(`${POLL_STATUS_URL}?id=eq.1&select=is_closed`, { headers: SUPABASE_HEADERS });
+        if (!response.ok) throw new Error(`狀態讀取失敗（${response.status}）`);
+        const rows = await response.json();
+        pollClosed = rows[0]?.is_closed === true;
+        statusEl.textContent = pollClosed ? '🔒 投票已結束' : '🟢 投票進行中';
+        submitEl.disabled = pollClosed;
+        submitEl.textContent = pollClosed ? '投票已結束' : '送出我的神聖一票';
+        submitEl.style.opacity = pollClosed ? '.55' : '1';
+        submitEl.style.cursor = pollClosed ? 'not-allowed' : 'pointer';
+      } catch (error) {
+        statusEl.textContent = '⚠️ 狀態讀取失敗';
+        console.error(error);
+      }
+    }
 
     async function loadVoteCounts() {
       const countsEl = document.getElementById('vote-counts');
@@ -637,6 +667,11 @@
       const nicknameInput = document.getElementById('nickname');
       const result = document.getElementById('result');
       const nickname = nicknameInput.value.trim();
+
+      if (pollClosed) {
+        result.textContent = '投票已結束，謝謝大家參與 🙏';
+        return;
+      }
 
       if (!nickname) {
         result.textContent = '先填暱稱，再把你的神聖一票送出去 🙏';
@@ -669,6 +704,46 @@
       }
     }
 
+    async function closePoll() {
+      const secretInput = document.getElementById('organizer-secret');
+      const result = document.getElementById('result');
+      const secret = secretInput.value.trim();
+
+      if (!secret) {
+        result.textContent = '請輸入主揪密語。';
+        secretInput.focus();
+        return;
+      }
+
+      result.textContent = '正在確認主揪權限……';
+      try {
+        const response = await fetch(CLOSE_POLL_URL, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ secret })
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) throw new Error('密語錯誤');
+          throw new Error(`關閉投票失敗（${response.status}）`);
+        }
+
+        secretInput.value = '';
+        result.textContent = '投票已結束。之後不再接受新票 🙏';
+        await loadPollStatus();
+        await loadVoteCounts();
+      } catch (error) {
+        result.textContent = error.message === '密語錯誤'
+          ? '密語不正確，投票仍然開放。'
+          : '無法結束投票，請稍後再試。';
+        console.error(error);
+      }
+    }
+
+    loadPollStatus();
     loadVoteCounts();
   </script>
 </body>
