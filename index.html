@@ -257,6 +257,24 @@
 
     <div class="note">※ 本頁目前使用示意店名與時間，之後可直接在這個檔案內替換成正式行程。</div>
 
+    <section class="day" aria-labelledby="dinner-vote-title">
+      <h2 class="day-title" id="dinner-vote-title"><span>VOTE</span>晚餐投票</h2>
+      <div class="stop" id="dinner-vote">
+        <p style="margin:0 0 12px;">先填暱稱，再選一個晚餐選項。投票送出後不能修改或刪除。</p>
+        <form id="dinner-vote-form">
+          <label for="nickname" style="display:block;margin-bottom:6px;font-weight:700;">暱稱</label>
+          <input id="nickname" name="nickname" type="text" maxlength="50" required autocomplete="nickname" placeholder="請輸入暱稱" style="width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--text);margin-bottom:14px;">
+          <div id="dinner-options" style="display:grid;gap:8px;"></div>
+          <button type="submit" style="width:100%;margin-top:14px;padding:12px 16px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:700;cursor:pointer;">送出投票</button>
+          <p id="vote-message" role="status" style="margin:10px 0 0;font-size:17px;color:var(--muted);"></p>
+        </form>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
+          <div style="font-weight:700;margin-bottom:7px;">目前票數</div>
+          <div id="vote-results" style="display:grid;gap:6px;"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="day" aria-labelledby="reminder-title">
       <h2 class="day-title" id="reminder-title"><span>NOTE</span>行前提醒</h2>
       <div class="note" style="margin-top: 0;">
@@ -268,5 +286,73 @@
 
     <footer>台南兩天一夜 · 行程草稿</footer>
   </main>
+
+  <script>
+    const SUPABASE_URL = "https://zibcfvkkswpywymlfqpa.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_eN5Z1YuNUwEFnbUIo1LREw_Ter0Fb2g";
+    const DINNER_OPTIONS = ["台菜", "火鍋", "燒肉", "台南小吃"];
+    const tableUrl = `${SUPABASE_URL}/rest/v1/dinner_votes`;
+    const headers = {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+      "Content-Type": "application/json"
+    };
+
+    const form = document.getElementById("dinner-vote-form");
+    const nicknameInput = document.getElementById("nickname");
+    const optionsEl = document.getElementById("dinner-options");
+    const resultsEl = document.getElementById("vote-results");
+    const messageEl = document.getElementById("vote-message");
+
+    DINNER_OPTIONS.forEach((option, index) => {
+      const label = document.createElement("label");
+      label.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fffaf2;cursor:pointer;";
+      label.innerHTML = `<input type="radio" name="option" value="${option}" ${index === 0 ? "required" : ""} style="width:18px;height:18px;"> <span>${option}</span>`;
+      optionsEl.appendChild(label);
+    });
+
+    async function loadVoteResults() {
+      try {
+        const response = await fetch(`${tableUrl}?select=option`, { headers });
+        if (!response.ok) throw new Error(`讀取失敗（${response.status}）`);
+        const votes = await response.json();
+        const counts = Object.fromEntries(DINNER_OPTIONS.map(option => [option, 0]));
+        votes.forEach(vote => { if (vote.option in counts) counts[vote.option] += 1; });
+        resultsEl.innerHTML = DINNER_OPTIONS.map(option =>
+          `<div style="display:flex;justify-content:space-between;gap:12px;"><span>${option}</span><strong>${counts[option]} 票</strong></div>`
+        ).join("");
+      } catch (error) {
+        resultsEl.textContent = "目前無法讀取票數，請稍後再試。";
+        console.error(error);
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const nickname = nicknameInput.value.trim();
+      const option = new FormData(form).get("option");
+      if (!nickname || !option) return;
+      messageEl.textContent = "送出中……";
+      try {
+        const response = await fetch(tableUrl, {
+          method: "POST",
+          headers: { ...headers, Prefer: "return=minimal" },
+          body: JSON.stringify({ nickname, option })
+        });
+        if (!response.ok) {
+          const detail = await response.text();
+          throw new Error(detail || `投票失敗（${response.status}）`);
+        }
+        messageEl.textContent = "投票成功！";
+        form.reset();
+        await loadVoteResults();
+      } catch (error) {
+        messageEl.textContent = "投票失敗，請稍後再試。";
+        console.error(error);
+      }
+    });
+
+    loadVoteResults();
+  </script>
 </body>
 </html>
