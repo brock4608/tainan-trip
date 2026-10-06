@@ -421,8 +421,7 @@
       }
     });
 
-    await loadPollStatus();
-    loadVoteResults();
+    loadPollStatus().then(() => loadVoteResults());
   </script>
 </body>
 </html>
